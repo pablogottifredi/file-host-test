@@ -1,0 +1,2071 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Afluenta API",
+    "description": "Service of personal data validation, credit rating and loan request",
+    "termsOfService": "https://www.afluenta.com/legales/terminos-y-condiciones-generales-version-7",
+    "contact": {
+      "name": "Afluenta API Team",
+      "email": "eguilleron@afluenta.com",
+      "url": "https://afluenta.com"
+    },
+    "license": {
+      "name": "Copyright © 2019 Afluenta S.A. Todos los derechos reservados",
+      "url": "https://www.afluenta.com/legales/terminos-y-condiciones-generales-version-7"
+    }
+  },
+  "servers": [
+    {
+      "description": "SwaggerHub API Auto Mocking",
+      "url": "https://virtserver.swaggerhub.com/afluenta/afluenta/1.0.0"
+    },
+    {
+      "url": "https://afluenta.mx/api/v1/",
+      "description": "production mexico"
+    },
+    {
+      "url": "https://afluenta.com/api/v1/",
+      "description": "production argentina"
+    },
+    {
+      "url": "http://afluenta_api.afl/api/v1/",
+      "description": "develop local"
+    }
+  ],
+  "host": "petstore.swagger.io",
+  "basePath": "/v2",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/loan/request/": {
+      "post": {
+        "tags": [
+          "loan"
+        ],
+        "security": [
+          {
+            "oAuth": [
+              "loan_request"
+            ]
+          }
+        ],
+        "operationId": "loanrequest",
+        "requestBody": {
+          "description": "The request body send minimal data to identify an applicant to loan. The income value an loan purposes are used to unnecesary evaluations",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "personal_info": {
+                    "$ref": "#/components/schemas/personal_info"
+                  },
+                  "loan": {
+                    "$ref": "#/components/schemas/loan_data"
+                  },
+                  "risk_people": {
+                    "$ref": "#/components/schemas/loan_risk_people"
+                  },
+                  "terms": {
+                    "$ref": "#/components/schemas/loan_terms"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Accepted, ready to get data in location",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Resource Location"
+              },
+              "ContentLocation": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Resource Location"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/locationresponse"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Accepted, but pending to be procesed",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Queue resource process Location"
+              },
+              "ContentLocation": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Queue resource process Location"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/locationresponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbiden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Data invalid or malformed in request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Detailed"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/loan/request": {
+      "get": {
+        "tags": [
+          "loan"
+        ],
+        "security": [
+          {
+            "oAuth": []
+          }
+        ],
+        "operationId": "requestloanstate",
+        "description": "Response if loan request was accepted or rejected. In body can obtain inform evaluation result.  If the loan was approved the user can apply to offer using the url /loan/apply/{loan id}",
+        "parameters": [
+          {
+            "name": "identitynumber",
+            "in": "query",
+            "description": "Local identification card of person or company, https://en.wikipedia.org/wiki/Identity_document",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "identityclass",
+            "in": "query",
+            "description": "Kind of identity enabled by country",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pid",
+            "in": "query",
+            "description": "Loan process id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/loan_report"
+                }
+              }
+            }
+          },
+          "303": {
+            "description": "Resource still in process, see queue",
+            "headers": {
+              "Location": {
+                "$ref": "#/components/headers/LocationLoanQueue"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/locationresponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbiden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/loan/request/queue/{PID}": {
+      "get": {
+        "tags": [
+          "loan"
+        ],
+        "security": [
+          {
+            "oAuth": []
+          }
+        ],
+        "operationId": "requestloanqueue",
+        "description": "A loan request must execute some async process with a response time over 3 seconds. With the aim of response a progress info to client, the queue endpoint provide progress status information of process. If a loan request was executed without run prevouisly loan prerequest the afluenta system must run this process before that respond a loan status.",
+        "parameters": [
+          {
+            "name": "PID",
+            "in": "path",
+            "description": "Progress of prerequest process, obtained sending POST data to loan/prerequest enpoint",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/status"
+                }
+              }
+            }
+          },
+          "303": {
+            "description": "Queue solved, the resources is ready to get",
+            "headers": {
+              "Location": {
+                "$ref": "#/components/headers/LocationLoanSuccess"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/locationresponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbiden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/helpers/countries/": {
+      "get": {
+        "tags": [
+          "helpers"
+        ],
+        "description": "Provide a list of id/names of countries according Afluenta model",
+        "security": [
+          {
+            "oAuth": []
+          }
+        ],
+        "operationId": "countriesGet",
+        "responses": {
+          "200": {
+            "description": "countries enabled list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/countries"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbiden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/helpers/loan/purposes/": {
+      "get": {
+        "tags": [
+          "helpers"
+        ],
+        "description": "Provide a list of purposes enabled by country according the Afluenta model",
+        "security": [
+          {
+            "oAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "type": "string"
+            },
+            "example": "es-MX"
+          }
+        ],
+        "operationId": "loanproposes",
+        "responses": {
+          "200": {
+            "description": "propouses enabled by kind of borrower",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/loan_purposes"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbiden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/helpers/zones/{idcountry}": {
+      "get": {
+        "tags": [
+          "helpers"
+        ],
+        "description": "Provide a list of id/names of zone of a country according Afluenta model",
+        "parameters": [
+          {
+            "name": "idcountry",
+            "in": "path",
+            "description": "A country provided by /helpers/countries",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 140
+          }
+        ],
+        "security": [
+          {
+            "oAuth": []
+          }
+        ],
+        "operationId": "zonesGet",
+        "responses": {
+          "200": {
+            "description": "zones enabled of country seleced",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/zones"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbiden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/helpers/locations/{idcountry}/{idzone}": {
+      "get": {
+        "tags": [
+          "helpers"
+        ],
+        "description": "Provide a list of id/names of locations of zone in country according Afluenta model",
+        "operationId": "locationGet",
+        "parameters": [
+          {
+            "name": "idcountry",
+            "in": "path",
+            "description": "A country provided by /helpers/countries",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "idzone",
+            "in": "path",
+            "description": "A country provided by /helpers/zones",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "security": [
+          {
+            "oAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "zones enabled of country seleced",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/location"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbiden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/helpers/identities/{idcountry}": {
+      "get": {
+        "tags": [
+          "helpers"
+        ],
+        "description": "Provide a list of kind of identies enabled by countries to identify the customer",
+        "security": [
+          {
+            "oAuth": []
+          }
+        ],
+        "operationId": "identityGet",
+        "parameters": [
+          {
+            "name": "idcountry",
+            "in": "path",
+            "description": "A country provided by /helpers/countries",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "countries enabled list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/identifier_type"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbiden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/helpers/educationlevels/": {
+      "get": {
+        "tags": [
+          "helpers"
+        ],
+        "description": "Provides a list of id/names of education levels according Afluenta model. This endpoint use the Accept Language field to respond data in a certain language",
+        "security": [
+          {
+            "oAuth": []
+          }
+        ],
+        "operationId": "educationlevelsGet",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "type": "string"
+            },
+            "example": "es-MX"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "education level list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/education_data"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbiden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/helpers/marriage/": {
+      "get": {
+        "tags": [
+          "helpers"
+        ],
+        "description": "Provides a list of id/names of marriage kinds according Afluenta model. This endpoint use the Accept Language field to respond data in a certain language",
+        "security": [
+          {
+            "oAuth": []
+          }
+        ],
+        "operationId": "marriageGet",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "type": "string"
+            },
+            "example": "es-MX"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "marriage level list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/marriage_status"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbiden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/helpers/jobs/": {
+      "get": {
+        "tags": [
+          "helpers"
+        ],
+        "description": "Provides a list of id/names of jobs kinds according Afluenta model. This endpoint use the Accept Language field to respond data in a certain language",
+        "security": [
+          {
+            "oAuth": []
+          }
+        ],
+        "operationId": "jobsGet",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "type": "string"
+            },
+            "example": "es-MX"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "jobs lists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/job_kind"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbiden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/helpers/jobs/activities/": {
+      "get": {
+        "tags": [
+          "helpers"
+        ],
+        "description": "Provides a list of id/names of jobs activities according Afluenta model. This endpoint use the Accept Language field to respond data in a certain language",
+        "security": [
+          {
+            "oAuth": []
+          }
+        ],
+        "operationId": "jobsactivitiesGet",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "schema": {
+              "type": "string"
+            },
+            "example": "es-MX"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "jobs activities lists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/job_activity"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbiden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error_Unhandled"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "loan",
+      "description": "Set of endpoints with each step of a loan workflow from request to approbation"
+    },
+    {
+      "name": "helpers",
+      "description": "Provide access to auxiliar models required in request process"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "headers": {
+      "X-RateLimit-Limit": {
+        "description": "Request limit per hour",
+        "schema": {
+          "type": "integer"
+        },
+        "example": 100
+      },
+      "X-RateLimit-Remaining": {
+        "schema": {
+          "type": "integer"
+        },
+        "example": 94
+      },
+      "Location": {
+        "description": "Async queue location to check progress /loan/prerequest/queue/PID, example /loan/prerequest/queue/65484",
+        "schema": {
+          "type": "string"
+        },
+        "example": "/loan/prerequest/queue/65484"
+      },
+      "LocationGetSolved": {
+        "description": "Location to get resource /loan/prerequest/RUT/X0001199944/PID",
+        "schema": {
+          "type": "string"
+        },
+        "example": "Location to get resource /loan/prerequest/RUT/X0001199944/PID"
+      },
+      "LocationApplicant": {
+        "description": "Location to get resource /applicant/{identityClass}/{identityNumber}, example /applicant/RUT/X0001199944",
+        "schema": {
+          "type": "string"
+        },
+        "example": "/applicant/RUT/X0001199944"
+      },
+      "LocationLoanQueue": {
+        "description": "Async queue location to check progress /loan/request/queue/PID, example /loan/request/queue/65484",
+        "schema": {
+          "type": "string"
+        },
+        "example": "/loan/prerequest/queue/65484"
+      },
+      "LocationLoanSuccess": {
+        "description": "Location to get resource /loan/request/RUT/X0001199944/PID",
+        "schema": {
+          "type": "string"
+        },
+        "example": "Location to get resource /loan/request/RUT/X0001199944/PID"
+      }
+    },
+    "securitySchemes": {
+      "oAuth": {
+        "type": "oauth2",
+        "description": "This API uses OAuth 2 with the implicit grant flow.",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth/token"
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "Error_Unhandled": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "Error_Detailed": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "subcode": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              },
+              "example": [
+                {
+                  "subcode": "VAL_3301",
+                  "text": "Field incomes invalid"
+                },
+                {
+                  "subcode": "VAL_3303",
+                  "text": "Field purporses invalid"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "personal_info": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "description": "Full first Name",
+            "type": "string"
+          },
+          "last_name": {
+            "description": "Lastname",
+            "type": "string"
+          },
+          "second_last_name": {
+            "description": "In some region, for multiple lastnames",
+            "type": "string"
+          },
+          "identity": {
+            "description": "Number and class of identity card",
+            "$ref": "#/components/schemas/identity"
+          },
+          "gender": {
+            "description": "From static enum",
+            "$ref": "#/components/schemas/gender"
+          },
+          "address": {
+            "descripton": "A full description of address",
+            "$ref": "#/components/schemas/address"
+          },
+          "marriage_status_id": {
+            "description": "A value from /helpers/marriage",
+            "type": "integer"
+          },
+          "education_level_id": {
+            "description": "A value from /helpers/educationlevel",
+            "type": "integer"
+          },
+          "job_kind": {
+            "description": "A value from /helpers/jobs",
+            "type": "integer"
+          },
+          "job_activities": {
+            "description": "A value from /helpers/jobs/activities",
+            "type": "integer"
+          },
+          "incomes": {
+            "type": "number",
+            "format": "float"
+          },
+          "aditional_incomes": {
+            "type": "number",
+            "format": "float"
+          },
+          "email": {
+            "$ref": "#/components/schemas/email"
+          },
+          "contact_phone": {
+            "$ref": "#/components/schemas/contact_phone"
+          }
+        },
+        "required": [
+          "first_name",
+          "last_name",
+          "identity",
+          "email",
+          "contact_phone"
+        ],
+        "example": {
+          "first_name": "Jhon",
+          "last_name": "Doe",
+          "second_last_name": "MotherLastname",
+          "identity": {
+            "class": "RUT",
+            "number": "29580181",
+            "irs": "20295801817",
+            "irs_digit": "7"
+          },
+          "gender": "male",
+          "address": {
+            "street_name": "Evergreen Terrance",
+            "street_number": "722",
+            "floor": "1",
+            "apartment": "A",
+            "zip_code": "92100",
+            "country_id": 230,
+            "zone_id": 1,
+            "city_id": 1331
+          },
+          "marriage_status_id": 1,
+          "education_level_id": 1,
+          "job_kind": 1,
+          "job_activities": 1,
+          "incomes": 100.5,
+          "additional_incomes": 110.4,
+          "email": "jon@mail.com",
+          "contact_phone": {
+            "country_code": "+12",
+            "area_code": "12",
+            "number": "12345678"
+          }
+        }
+      },
+      "education_data": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
+        "example": [
+          {
+            "id": 1,
+            "description": "Bachelor"
+          },
+          {
+            "id": 2,
+            "description": "Master Degree"
+          }
+        ]
+      },
+      "marriage_status": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
+        "example": [
+          {
+            "id": 1,
+            "description": "married"
+          },
+          {
+            "id": 2,
+            "description": "single"
+          }
+        ]
+      },
+      "job_kind": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
+        "example": [
+          {
+            "id": 1,
+            "description": "House Keeper"
+          },
+          {
+            "id": 2,
+            "description": "Student"
+          },
+          {
+            "id": 3,
+            "description": "Long term contract"
+          }
+        ]
+      },
+      "job_activity": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "description": {
+              "type": "string"
+            },
+            "id_job": {
+              "type": "integer"
+            }
+          }
+        },
+        "example": [
+          {
+            "id": 1,
+            "description": "Manager",
+            "id_job": 3
+          },
+          {
+            "id": 2,
+            "description": "Employee",
+            "id_job": 3
+          },
+          {
+            "id": 3,
+            "description": "Analyst",
+            "id_job": 3
+          }
+        ]
+      },
+      "loan_data": {
+        "type": "object",
+        "properties": {
+          "purpose_id": {
+            "type": "integer",
+            "description": "A valid id from /helpers/loan/purposes"
+          },
+          "kind": {
+            "type": "string",
+            "description": "The purpose of loan request",
+            "enum": [
+              "personal",
+              "commercial"
+            ]
+          },
+          "amount": {
+            "type": "number",
+            "format": "float"
+          },
+          "term": {
+            "type": "integer",
+            "enum": [
+              12,
+              18,
+              24,
+              36,
+              48
+            ]
+          },
+          "due_week": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          "description_purpose": {
+            "type": "string",
+            "description": "A description of purpose of loan request"
+          }
+        },
+        "required": [
+          "purpose_id",
+          "kind",
+          "amount",
+          "term",
+          "due_week",
+          "description_purpose"
+        ],
+        "example": {
+          "purpose_id": 1,
+          "kind": "personal",
+          "amount": 1000.54,
+          "term": 48,
+          "due_week": 2,
+          "description_purpose": "Due consolidation"
+        }
+      },
+      "loan_risk_people": {
+        "type": "object",
+        "properties": {
+          "gafi_exposed_person": {
+            "type": "boolean"
+          },
+          "gafi_exposed_info": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "gafi_exposed_person": true,
+          "gafi_exposed_info": "United States president"
+        }
+      },
+      "loan_terms": {
+        "type": "object",
+        "properties": {
+          "accept_loan_terms": {
+            "type": "boolean"
+          },
+          "accept_loan_insurance_terms": {
+            "type": "boolean"
+          }
+        },
+        "example": {
+          "accept_loan_terms": true,
+          "accept_loan_insurance_terms": true
+        }
+      },
+      "loan_info": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 442
+          },
+          "amount": {
+            "type": "integer",
+            "format": "number",
+            "example": 100.54
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "term": {
+            "type": "integer",
+            "example": 48
+          },
+          "due_week": {
+            "type": "integer",
+            "example": 2
+          }
+        }
+      },
+      "contact_phone": {
+        "type": "object",
+        "description": "A valid phone contact",
+        "properties": {
+          "country_code": {
+            "type": "string",
+            "description": "International code"
+          },
+          "area_code": {
+            "type": "string",
+            "description": "Area code"
+          },
+          "number": {
+            "type": "string",
+            "description": "Number"
+          }
+        }
+      },
+      "email": {
+        "type": "string",
+        "format": "email",
+        "description": "A valid email address",
+        "pattern": "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
+      },
+      "loan_prerequest_data": {
+        "type": "object",
+        "properties": {
+          "identity": {
+            "$ref": "#/components/schemas/identity"
+          },
+          "loan": {
+            "type": "object",
+            "properties": {
+              "purpose_id": {
+                "type": "integer",
+                "description": "A valid if from /helpers/loan/purposes"
+              },
+              "kind": {
+                "type": "string",
+                "description": "The purpose of loan request",
+                "enum": [
+                  "personal",
+                  "commercial"
+                ]
+              }
+            }
+          },
+          "email": {
+            "$ref": "#/components/schemas/email"
+          },
+          "contact_phone": {
+            "$ref": "#/components/schemas/contact_phone"
+          },
+          "incomes": {
+            "description": "A value between 0 and 1000000",
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "required": [
+          "identity",
+          "loan",
+          "email",
+          "contact_phone",
+          "incomes"
+        ],
+        "example": {
+          "identity": {
+            "class": "RUT",
+            "number": "X393991219212"
+          },
+          "email": "hello@afluenta.com",
+          "loan": {
+            "purpose_id": 12,
+            "kind": "personal"
+          },
+          "contact_phone": {
+            "country_code": "+12",
+            "area_code": "12",
+            "number": "12345678"
+          },
+          "incomes": 100.4
+        }
+      },
+      "loan_purposes": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "description": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "description": "The purpose of loan request",
+              "enum": [
+                "personal",
+                "commercial"
+              ]
+            }
+          }
+        }
+      },
+      "identifier_type": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            }
+          }
+        },
+        "example": [
+          {
+            "id": 1,
+            "name": "Documento Nacional de Identidad",
+            "title": "DNI"
+          },
+          {
+            "id": 2,
+            "name": "Clave unica de identificacion tributaria",
+            "title": "CUIT"
+          }
+        ]
+      },
+      "identity": {
+        "type": "object",
+        "properties": {
+          "class": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "irs": {
+            "type": "string"
+          },
+          "irs_digit": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "class": "CUIT",
+          "number": 30711781214
+        }
+      },
+      "address": {
+        "type": "object",
+        "properties": {
+          "street_name": {
+            "type": "string"
+          },
+          "street_number": {
+            "type": "string"
+          },
+          "floor": {
+            "type": "string"
+          },
+          "appartment": {
+            "type": "string"
+          },
+          "zip_code": {
+            "type": "string"
+          },
+          "country_id": {
+            "type": "integer"
+          },
+          "zone_id": {
+            "type": "integer"
+          },
+          "location_id": {
+            "type": "integer"
+          }
+        },
+        "example": {
+          "street_name": "Evergreen Terrace",
+          "street_number": "742",
+          "floor": "1",
+          "apartment": "4D",
+          "zip_code": "C1429DAI"
+        }
+      },
+      "gender": {
+        "type": "string",
+        "enum": [
+          "male",
+          "female"
+        ]
+      },
+      "countries": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "code": {
+              "type": "string"
+            }
+          }
+        },
+        "example": [
+          {
+            "id": 3,
+            "name": "Argelia",
+            "code": "AZ"
+          },
+          {
+            "id": 10,
+            "name": "Argentina",
+            "title": "AR"
+          },
+          {
+            "id": 140,
+            "name": "Mexico",
+            "title": "MX"
+          },
+          {
+            "id": 171,
+            "name": "Peru",
+            "title": "PE"
+          }
+        ]
+      },
+      "location": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "example": [
+          {
+            "id": 1331,
+            "name": "Dover",
+            "country_id": 230,
+            "zone_id": 1
+          },
+          {
+            "id": 2,
+            "name": "Fresno",
+            "country_id": 230,
+            "zone_id": 2
+          },
+          {
+            "id": null,
+            "name": "Alpine",
+            "country_id": 230,
+            "zone_id": 3
+          }
+        ]
+      },
+      "zones": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "example": [
+          {
+            "id": 1,
+            "name": "Delaware",
+            "country_id": 230
+          },
+          {
+            "id": 2,
+            "name": "California",
+            "country_id": 230
+          },
+          {
+            "id": 140,
+            "name": "Utah",
+            "country_id": 230
+          }
+        ]
+      },
+      "status": {
+        "type": "object",
+        "properties": {
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          },
+          "step": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "example": {
+          "started_at": "1999-11-27 15:49:37,459",
+          "status": "processing",
+          "step": 3,
+          "total": 10
+        }
+      },
+      "loan_report": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "success",
+              "aborted",
+              "unknown",
+              "rejected"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "cluster": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "example": {
+          "state": "rejected",
+          "message": "Unprocessable entity",
+          "details": [
+            {
+              "code": "REJ_3301",
+              "text": "Low declared incomes"
+            },
+            {
+              "code": "REJ_3302",
+              "text": "Rules not runned"
+            }
+          ],
+          "cluster": {
+            "id": 99,
+            "description": "OUT"
+          }
+        }
+      },
+      "locationresponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
